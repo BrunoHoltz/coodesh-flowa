@@ -1,0 +1,66 @@
+## C# / .NET
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+.vs/
+_ReSharper*/
+*.ncrunchsolution
+*.ncrunchproject
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+## NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+## Build
+publish/
+artifacts/
+
+## Rider / JetBrains
+.idea/
+*.sln.iml
+
+## VSCode
+.vscode/
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+## Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+## Docker
+.dockerignore
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+## Logs
+*.log
+logs/
+
+## Secrets / env
+.env
+.env.*
+!.env.example
+*.pfx
+*.key
+secrets/
