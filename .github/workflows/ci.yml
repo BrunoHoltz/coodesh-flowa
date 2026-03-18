@@ -1,1 +1,11 @@
 name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - name: No-op
+        run: echo "TODO CI pipeline"
