@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>FixOrderBooking.Client</AssemblyName>
+    <RootNamespace>FixOrderBooking.Client</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="config\**" />
+    <Content Remove="config\**" />
+    <EmbeddedResource Remove="config\**" />
+    <None Remove="config\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="QuickFIXn.FIX44" Version="1.14.0" />
+  </ItemGroup>
+
+</Project>

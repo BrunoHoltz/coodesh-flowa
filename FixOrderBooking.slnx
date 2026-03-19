@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FixOrderBooking.Client/FixOrderBooking.Client.csproj" />
+    <Project Path="src/FixOrderBooking.Server/FixOrderBooking.Server.csproj" />
+  </Folder>
+</Solution>
