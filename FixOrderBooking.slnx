@@ -3,4 +3,8 @@
     <Project Path="src/FixOrderBooking.Client/FixOrderBooking.Client.csproj" />
     <Project Path="src/FixOrderBooking.Server/FixOrderBooking.Server.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FixOrderBooking.Client.Tests/FixOrderBooking.Client.Tests.csproj" />
+    <Project Path="tests/FixOrderBooking.Server.Tests/FixOrderBooking.Server.Tests.csproj" />
+  </Folder>
 </Solution>

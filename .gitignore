@@ -64,3 +64,6 @@ logs/
 *.pfx
 *.key
 secrets/
+
+## AI
+.claude

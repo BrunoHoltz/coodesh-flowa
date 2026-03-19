@@ -32,6 +32,7 @@ namespace FixOrderBooking.Server.Domain
         public static implicit operator char(OrderSide val) => val.Value;
         public static OrderSide Buy => QuickFix.Fields.Side.BUY;
         public static OrderSide Sell => QuickFix.Fields.Side.SELL;
-        public static bool IsValid(char val) => val == Buy || val == Sell;
+        public static bool IsValid(char val) =>
+            val == QuickFix.Fields.Side.BUY || val == QuickFix.Fields.Side.SELL;
     }
 }
