@@ -28,7 +28,7 @@ public sealed class OrderBookServiceTests
         _repository.Get("CL1").Returns((Order?)null);
         _repository.Create(Arg.Any<Order>()).Returns(order);
 
-        var result = _service.CreateOrder("CL1", "AAPL", OrderSide.Buy, 10, 150m);
+        var result = _service.CreateOrder("CL1", "PETR4", OrderSide.Buy, 10, 150m);
 
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(result.Value.ClOrdId, Is.EqualTo("CL1"));
@@ -39,7 +39,7 @@ public sealed class OrderBookServiceTests
     {
         _repository.Get("CL1").Returns(MakeOrder("CL1"));
 
-        var result = _service.CreateOrder("CL1", "AAPL", OrderSide.Buy, 10, 150m);
+        var result = _service.CreateOrder("CL1", "PETR4", OrderSide.Buy, 10, 150m);
 
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.ErrorType, Is.EqualTo(ErrorType.Duplicate));
@@ -49,7 +49,7 @@ public sealed class OrderBookServiceTests
     [TestCase("   ")]
     public void CreateOrder_EmptyClOrdId_ReturnsValidationError(string clOrdId)
     {
-        var result = _service.CreateOrder(clOrdId, "AAPL", OrderSide.Buy, 10, 150m);
+        var result = _service.CreateOrder(clOrdId, "PETR4", OrderSide.Buy, 10, 150m);
 
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.ErrorType, Is.EqualTo(ErrorType.Validation));
@@ -69,7 +69,7 @@ public sealed class OrderBookServiceTests
     [TestCase(-1)]
     public void CreateOrder_NonPositiveQuantity_ReturnsValidationError(decimal qty)
     {
-        var result = _service.CreateOrder("CL1", "AAPL", OrderSide.Buy, qty, 150m);
+        var result = _service.CreateOrder("CL1", "PETR4", OrderSide.Buy, qty, 150m);
 
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.ErrorType, Is.EqualTo(ErrorType.Validation));
@@ -79,7 +79,7 @@ public sealed class OrderBookServiceTests
     [TestCase(-1)]
     public void CreateOrder_NonPositivePrice_ReturnsValidationError(decimal price)
     {
-        var result = _service.CreateOrder("CL1", "AAPL", OrderSide.Buy, 10, price);
+        var result = _service.CreateOrder("CL1", "PETR4", OrderSide.Buy, 10, price);
 
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.ErrorType, Is.EqualTo(ErrorType.Validation));
@@ -91,7 +91,7 @@ public sealed class OrderBookServiceTests
         _repository.Get("CL1").Returns((Order?)null);
         _repository.Create(Arg.Any<Order>()).Throws(new Exception("db failure"));
 
-        var result = _service.CreateOrder("CL1", "AAPL", OrderSide.Buy, 10, 150m);
+        var result = _service.CreateOrder("CL1", "PETR4", OrderSide.Buy, 10, 150m);
 
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.ErrorType, Is.EqualTo(ErrorType.InternalError));
@@ -144,28 +144,31 @@ public sealed class OrderBookServiceTests
     }
 
     [Test]
-    public void GetActiveOrders_ReturnsAllFromRepository()
+    public void GetActiveOrderBook_ReturnsAllFromRepository()
     {
-        var orders = new List<Order> { MakeOrder("CL1"), MakeOrder("CL2") };
-        _repository.FindActive().Returns(orders);
+        var grouped = new Dictionary<string, FixOrderBooking.Server.Domain.OrderBook>
+        {
+            ["PETR4"] = new() { Symbol = "PETR4", Buy = [MakeOrder("CL1"), MakeOrder("CL2")], Sell = [] }
+        };
+        _repository.GetActiveOrderBook().Returns(grouped);
 
-        var result = _service.GetActiveOrders();
+        var result = _service.GetActiveOrderBook();
 
         Assert.That(result.IsSuccess, Is.True);
-        Assert.That(result.Value, Has.Count.EqualTo(2));
+        Assert.That(result.Value.Values.Sum(b => b.Buy.Count + b.Sell.Count), Is.EqualTo(2));
     }
 
     [Test]
-    public void GetActiveOrders_RepositoryThrows_ReturnsInternalError()
+    public void GetActiveOrderBook_RepositoryThrows_ReturnsInternalError()
     {
-        _repository.FindActive().Throws(new Exception("db failure"));
+        _repository.GetActiveOrderBook().Throws(new Exception("db failure"));
 
-        var result = _service.GetActiveOrders();
+        var result = _service.GetActiveOrderBook();
 
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.ErrorType, Is.EqualTo(ErrorType.InternalError));
     }
 
     private static Order MakeOrder(string clOrdId) =>
-        new(clOrdId, "AAPL", OrderSide.Buy, 10, 150m);
+        new(clOrdId, "PETR4", OrderSide.Buy, 10, 150m);
 }

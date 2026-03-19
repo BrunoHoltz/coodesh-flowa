@@ -24,7 +24,7 @@ public sealed class InMemoryOrderRepositoryEdgeCaseTests
     [Test]
     public void Create_PreservesExistingOrderId()
     {
-        var order = new Order("CL1", "AAPL", OrderSide.Buy, 10, 150m, orderId: "PRESET-ID");
+        var order = new Order("CL1", "PETR4", OrderSide.Buy, 10, 150m, orderId: "PRESET-ID");
         var created = _repository.Create(order);
 
         Assert.That(created.OrderId, Is.EqualTo("PRESET-ID"));
@@ -58,25 +58,29 @@ public sealed class InMemoryOrderRepositoryEdgeCaseTests
     }
 
     [Test]
-    public void FindActive_SingleOrder_ReturnsThatOrder()
+    public void GetActiveOrderBook_SingleOrder_ReturnsThatOrder()
     {
         var order = _repository.Create(MakeOrder("CL1"));
 
-        var active = _repository.FindActive();
+        var allOrders = _repository.GetActiveOrderBook().Values
+            .SelectMany(b => b.Buy.Concat(b.Sell)).ToList();
 
-        Assert.That(active, Has.Count.EqualTo(1));
-        Assert.That(active[0].ClOrdId, Is.EqualTo(order.ClOrdId));
+        Assert.That(allOrders, Has.Count.EqualTo(1));
+        Assert.That(allOrders[0].ClOrdId, Is.EqualTo(order.ClOrdId));
     }
 
     [Test]
-    public void FindActive_AfterRemoveAll_ReturnsEmpty()
+    public void GetActiveOrderBook_AfterRemoveAll_HasNoOrders()
     {
         _repository.Create(MakeOrder("CL1"));
         _repository.Create(MakeOrder("CL2"));
         _repository.Remove("CL1");
         _repository.Remove("CL2");
 
-        Assert.That(_repository.FindActive(), Is.Empty);
+        var totalCount = _repository.GetActiveOrderBook().Values
+            .Sum(b => b.Buy.Count + b.Sell.Count);
+
+        Assert.That(totalCount, Is.Zero);
     }
 
     [Test]
@@ -94,5 +98,5 @@ public sealed class InMemoryOrderRepositoryEdgeCaseTests
     }
 
     private static Order MakeOrder(string clOrdId) =>
-        new(clOrdId, "AAPL", OrderSide.Buy, 10, 150m);
+        new(clOrdId, "PETR4", OrderSide.Buy, 10, 150m);
 }

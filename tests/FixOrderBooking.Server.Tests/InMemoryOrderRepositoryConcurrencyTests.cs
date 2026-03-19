@@ -15,18 +15,19 @@ public sealed class InMemoryOrderRepositoryConcurrencyTests
     [Test]
     public async Task Create_ConcurrentRequests_AllOrdersStored()
     {
-        const int threads = 10;
-        const int perThread = 100;
+        const int scopes = 10;
+        const int perScope = 100;
 
-        var tasks = Enumerable.Range(0, threads).Select(t => Task.Run(() =>
+        var tasks = Enumerable.Range(0, scopes).Select(t => Task.Run(() =>
         {
-            for (int i = 0; i < perThread; i++)
+            for (int i = 0; i < perScope; i++)
                 _repository.Create(MakeOrder($"CL-{t}-{i}"));
         }));
 
         await Task.WhenAll(tasks);
 
-        Assert.That(_repository.FindActive(), Has.Count.EqualTo(threads * perThread));
+        var totalCount = _repository.GetActiveOrderBook().Values.Sum(b => b.Buy.Count + b.Sell.Count);
+        Assert.That(totalCount, Is.EqualTo(scopes * perScope));
     }
 
     [Test]
@@ -62,7 +63,8 @@ public sealed class InMemoryOrderRepositoryConcurrencyTests
         var results = await Task.WhenAll(tasks);
 
         Assert.That(results, Has.All.True);
-        Assert.That(_repository.FindActive(), Is.Empty);
+        var totalCount = _repository.GetActiveOrderBook().Values.Sum(b => b.Buy.Count + b.Sell.Count);
+        Assert.That(totalCount, Is.Zero);
     }
 
     [Test]
@@ -82,14 +84,14 @@ public sealed class InMemoryOrderRepositoryConcurrencyTests
     }
 
     [Test]
-    public async Task FindActive_DuringConcurrentModification_DoesNotThrow()
+    public async Task GetActiveOrderBook_DuringConcurrentModification_DoesNotThrow()
     {
         const int count = 100;
         for (int i = 0; i < count; i++)
             _repository.Create(MakeOrder($"CL-{i}"));
 
         var readers = Enumerable.Range(0, 5).Select(_ =>
-            Task.Run(() => { for (int i = 0; i < 50; i++) _repository.FindActive(); }));
+            Task.Run(() => { for (int i = 0; i < 50; i++) _repository.GetActiveOrderBook(); }));
 
         var writers = Enumerable.Range(count, 50).Select(i =>
             Task.Run(() => _repository.Create(MakeOrder($"CL-{i}"))));
@@ -98,5 +100,5 @@ public sealed class InMemoryOrderRepositoryConcurrencyTests
     }
 
     private static Order MakeOrder(string clOrdId) =>
-        new(clOrdId, "AAPL", OrderSide.Buy, 10, 150m);
+        new(clOrdId, "PETR4", OrderSide.Buy, 10, 150m);
 }

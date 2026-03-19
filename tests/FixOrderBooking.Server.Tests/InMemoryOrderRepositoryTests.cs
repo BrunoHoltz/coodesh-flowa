@@ -77,43 +77,51 @@ public sealed class InMemoryOrderRepositoryTests
     }
 
     [Test]
-    public void FindActive_EmptyRepository_ReturnsEmptyList()
+    public void GetActiveOrderBook_EmptyRepository_ReturnsEmptyDictionary()
     {
-        Assert.That(_repository.FindActive(), Is.Empty);
+        Assert.That(_repository.GetActiveOrderBook(), Is.Empty);
     }
 
     [Test]
-    public void FindActive_ReturnsAllCreatedOrders()
+    public void GetActiveOrderBook_ReturnsAllCreatedOrders()
     {
         _repository.Create(MakeOrder("CL1"));
         _repository.Create(MakeOrder("CL2"));
         _repository.Create(MakeOrder("CL3"));
 
-        Assert.That(_repository.FindActive(), Has.Count.EqualTo(3));
+        var book = _repository.GetActiveOrderBook();
+        Assert.That(book.Values.Sum(b => b.Buy.Count + b.Sell.Count), Is.EqualTo(3));
     }
 
     [Test]
-    public void FindActive_ExcludesRemovedOrders()
+    public void GetActiveOrderBook_ExcludesRemovedOrders()
     {
         _repository.Create(MakeOrder("CL1"));
         _repository.Create(MakeOrder("CL2"));
         _repository.Remove("CL1");
 
-        Assert.That(_repository.FindActive(), Has.Count.EqualTo(1));
+        var book = _repository.GetActiveOrderBook();
+        Assert.That(book.Values.Sum(b => b.Buy.Count + b.Sell.Count), Is.EqualTo(1));
     }
 
     [Test]
-    public void FindActive_ReturnsOrdersSortedByCreatedAt()
+    public void GetActiveOrderBook_ReturnsBuysInAscendingPriceThenFifoOrder()
     {
         _repository.Create(MakeOrder("CL1"));
         _repository.Create(MakeOrder("CL2"));
 
-        var active = _repository.FindActive();
+        var book = _repository.GetActiveOrderBook();
+        Assert.That(book.Values.Sum(b => b.Buy.Count + b.Sell.Count), Is.EqualTo(2),
+            "Total order count mismatch — Create may not have run");
 
-        Assert.That(active[0].ClOrdId, Is.EqualTo("CL1"));
-        Assert.That(active[1].ClOrdId, Is.EqualTo("CL2"));
+        Assert.That(book, Contains.Key("PETR4"));
+        var buys = book["PETR4"].Buy;
+
+        Assert.That(buys, Has.Count.EqualTo(2));
+        Assert.That(buys[0].ClOrdId, Is.EqualTo("CL1"));
+        Assert.That(buys[1].ClOrdId, Is.EqualTo("CL2"));
     }
 
     private static Order MakeOrder(string clOrdId) =>
-        new(clOrdId, "AAPL", OrderSide.Buy, 10, 150m);
+        new(clOrdId, "PETR4", OrderSide.Buy, 10, 150m);
 }

@@ -6,5 +6,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/FixOrderBooking.Client.Tests/FixOrderBooking.Client.Tests.csproj" />
     <Project Path="tests/FixOrderBooking.Server.Tests/FixOrderBooking.Server.Tests.csproj" />
+    <!-- <Project Path="tests/FixOrderBooking.Benchmark/FixOrderBooking.Benchmark.csproj" /> -->
+    <Project Path="tests/FixOrderBooking.IntegrationTests/FixOrderBooking.IntegrationTests.csproj" />
   </Folder>
 </Solution>

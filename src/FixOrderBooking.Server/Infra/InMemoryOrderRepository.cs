@@ -90,7 +90,7 @@ namespace FixOrderBooking.Server.Infra
                     result[symbol] = new OrderBook
                     {
                         Symbol = symbol,
-                        Buy  = book.Bids.Values.SelectMany(l => l).ToList(),
+                        Buy = book.Bids.Values.SelectMany(l => l).ToList(),
                         Sell = book.Offers.Values.SelectMany(l => l).ToList()
                     };
                 }
