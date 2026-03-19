@@ -28,9 +28,9 @@ public class DockerComposeFixture
         var fixDelay = TimeSpan.FromSeconds(Config.GetValue("Infra:Timeouts:FixSessionDelaySeconds", 5));
 
         await WaitForPortAsync("localhost", Config.GetValue("Infra:Endpoints:Server:HTTP:Port", 5000), "Server HTTP", timeout);
-        await WaitForPortAsync("localhost", Config.GetValue("Infra:Endpoints:Server:FIX:Port",  5001), "Server FIX",  timeout);
+        await WaitForPortAsync("localhost", Config.GetValue("Infra:Endpoints:Server:FIX:Port", 5001), "Server FIX", timeout);
         await WaitForPortAsync("localhost", Config.GetValue("Infra:Endpoints:Client:HTTP:Port", 5100), "Client HTTP", timeout);
-        await WaitForPortAsync("localhost", Config.GetValue("Infra:Endpoints:Client:FIX:Port",  5002), "Client FIX",  timeout);
+        await WaitForPortAsync("localhost", Config.GetValue("Infra:Endpoints:Client:FIX:Port", 5002), "Client FIX", timeout);
 
         await Task.Delay(fixDelay);
     }
@@ -107,7 +107,7 @@ public class DockerComposeFixture
         }
         catch { }
         Assert.Ignore("Docker daemon is not running. Start Docker Desktop and retry.");
-    }    
+    }
     private static async Task WaitForPortAsync(string host, int port, string description, TimeSpan timeout)
     {
         var deadline = DateTime.UtcNow + timeout;

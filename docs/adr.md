@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-|         | Name                  | Rational                                                                                                                                                                                                                                                                      |
+|         | Nome                  | Racional                                                                                                                                                                                                                                                                      |
 | ------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ADR-001 | FIX 4.4               | Embora o FIX 5.0+ apresente muitas melhorias de performance, foi selecionado o FIX 4.4 pois<br />é amplamente mais adotado até a presente data e isso facilita as integrações.                                                                                         |
 | ADR-002 | App Client mínimo    | O app Client tem uma estrutura de pastas e design pattern mínimo para funcionar como um<br />"tiny stateless proxy" para uma melhor performance                                                                                                                              |
