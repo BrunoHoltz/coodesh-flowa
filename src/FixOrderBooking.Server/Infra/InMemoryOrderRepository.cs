@@ -13,7 +13,12 @@ namespace FixOrderBooking.Server.Infra
         private readonly Dictionary<string, LinkedListNode<Order>> _orderNodes = [];
 
         // Symbol -> Price -> OrderBook
-        private readonly Dictionary<string, OrderBook> _orderBooksBySymbol = [];
+        struct SortedBookStore()
+        {
+            public SortedDictionary<decimal, LinkedList<Order>> Bids = [];
+            public SortedDictionary<decimal, LinkedList<Order>> Offers = [];
+        }
+        private readonly Dictionary<string, SortedBookStore> _orderBookStoreBySymbol = [];
 
         public Order Create(Order order)
         {
@@ -23,10 +28,10 @@ namespace FixOrderBooking.Server.Infra
             {
                 _ordersById[order.ClOrdId!] = order;
 
-                if (!_orderBooksBySymbol.TryGetValue(order.Symbol, out var book))
+                if (!_orderBookStoreBySymbol.TryGetValue(order.Symbol, out var book))
                 {
-                    book = new OrderBook();
-                    _orderBooksBySymbol[order.Symbol] = book;
+                    book = new SortedBookStore();
+                    _orderBookStoreBySymbol[order.Symbol] = book;
                 }
 
                 var side = order.Side == OrderSide.Buy ? book.Bids : book.Offers;
@@ -51,7 +56,7 @@ namespace FixOrderBooking.Server.Infra
                     return false;
 
                 var order = node.Value;
-                var book = _orderBooksBySymbol[order.Symbol];
+                var book = _orderBookStoreBySymbol[order.Symbol];
                 var side = order.Side == OrderSide.Buy ? book.Bids : book.Offers;
 
                 // O(1) node removal
@@ -74,19 +79,20 @@ namespace FixOrderBooking.Server.Infra
                 return _ordersById.TryGetValue(clOrdId, out var order) ? order : null;
         }
 
-        public IReadOnlyList<Order> FindActive()
+        public IReadOnlyDictionary<string, OrderBook> GetActiveOrderBook()
         {
             lock (_lock)
             {
-                var result = new List<Order>(_ordersById.Count);
+                var result = new Dictionary<string, OrderBook>();
 
-                foreach (var (_, book) in _orderBooksBySymbol)
+                foreach (var (symbol, book) in _orderBookStoreBySymbol)
                 {
-                    foreach (var (_, orders) in book.Bids)
-                        result.AddRange(orders);
-
-                    foreach (var (_, orders) in book.Offers)
-                        result.AddRange(orders);
+                    result[symbol] = new OrderBook
+                    {
+                        Symbol = symbol,
+                        Buy  = book.Bids.Values.SelectMany(l => l).ToList(),
+                        Sell = book.Offers.Values.SelectMany(l => l).ToList()
+                    };
                 }
 
                 return result;

@@ -6,5 +6,5 @@ public interface IOrderBookService
 {
     Result<Order> CreateOrder(string clOrdId, string symbol, OrderSide side, decimal quantity, decimal price);
     Result<bool> CancelOrder(string clOrdId);
-    Result<IReadOnlyList<Order>> GetActiveOrders();
+    Result<IReadOnlyDictionary<string, OrderBook>> GetActiveOrderBook();
 }

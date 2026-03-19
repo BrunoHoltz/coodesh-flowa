@@ -3,9 +3,9 @@ using QuickFix.Fields;
 using QuickFix.FIX44;
 using Message = QuickFix.Message;
 
-namespace FixOrderBooking.Client.Application;
+namespace FixOrderBooking.Client.FIX;
 
-public sealed class FixClientApplication : MessageCracker, IApplication
+public class FixClientApplication : MessageCracker, IApplication
 {
     private readonly ILogger<FixClientApplication> _logger;
     private Session? _session;

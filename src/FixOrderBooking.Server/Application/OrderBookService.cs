@@ -24,7 +24,7 @@ public sealed class OrderBookService : IOrderBookService
             if (string.IsNullOrWhiteSpace(symbol))
                 return Result<Order>.Fail(ErrorType.Validation, "Symbol is required.");
 
-            if (!OrderSide.IsValid(side))
+            if ((int)side <= 0)
                 return Result<Order>.Fail(ErrorType.Validation, $"Side '{(char)side}' is not valid. Expected Buy (1) or Sell (2).");
 
             if (quantity <= 0)
@@ -70,17 +70,18 @@ public sealed class OrderBookService : IOrderBookService
         }
     }
 
-    public Result<IReadOnlyList<Order>> GetActiveOrders()
+    public Result<IReadOnlyDictionary<string, OrderBook>> GetActiveOrderBook()
     {
         try
         {
-            var orders = _ordersRepository.FindActive();
-            return Result<IReadOnlyList<Order>>.Ok(orders);
+            var grouped = _ordersRepository.GetActiveOrderBook();
+            return Result.Ok(grouped);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unexpected error retrieving active orders");
-            return Result<IReadOnlyList<Order>>.Fail(ErrorType.InternalError, "An internal error occurred while retrieving active orders.");
+            return Result<IReadOnlyDictionary<string, OrderBook>>.Fail(
+                ErrorType.InternalError, "An internal error occurred while retrieving active orders.");
         }
     }
 }

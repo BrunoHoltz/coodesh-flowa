@@ -32,14 +32,15 @@ public sealed class FixServerService : IHostedService, IDisposable
         var targetCompId = _config["FIX:TargetCompId"] ?? "CLIENT1";
         var heartBtInt = _config["FIX:HeartBtInt"] ?? "30";
 
+        var dataDictionary = Path.Combine(AppContext.BaseDirectory, "FIX44.xml");
+
         var cfg = $"""
             [DEFAULT]
             ConnectionType=acceptor
-            FileStorePath=store
             StartTime=00:00:00
             EndTime=00:00:00
             UseDataDictionary=Y
-            DataDictionary=FIX44.xml
+            DataDictionary={dataDictionary}
 
             [SESSION]
             BeginString=FIX.4.4
@@ -50,7 +51,7 @@ public sealed class FixServerService : IHostedService, IDisposable
             """;
 
         var settings = new SessionSettings(new StringReader(cfg));
-        var storeFactory = new FileStoreFactory(settings);
+        var storeFactory = new MemoryStoreFactory();
 
         _acceptor = new ThreadedSocketAcceptor(_app, storeFactory, settings, loggerFactory: _loggerFactory);
         _acceptor.Start();

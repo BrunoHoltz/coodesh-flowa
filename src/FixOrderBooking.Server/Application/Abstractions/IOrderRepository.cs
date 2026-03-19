@@ -7,5 +7,5 @@ public interface IOrderRepository
     Order Create(Order order);
     Order? Get(string clOrdId);
     bool Remove(string clOrdId);
-    IReadOnlyList<Order> FindActive();
+    IReadOnlyDictionary<string, OrderBook> GetActiveOrderBook();
 }

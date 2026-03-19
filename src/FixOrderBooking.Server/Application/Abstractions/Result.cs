@@ -32,4 +32,12 @@ namespace FixOrderBooking.Server.Application.Abstractions
         public static Result<T> Fail(ErrorType type, string message)
             => new(type, message);
     }
+    public sealed class Result
+    {
+        public static Result<T> Ok<T>(T value)
+            => Result<T>.Ok(value);
+
+        public static Result<T> Fail<T>(ErrorType type, string message)
+            => Result<T>.Fail(type, message);
+    }
 }

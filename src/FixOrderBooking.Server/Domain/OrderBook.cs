@@ -2,7 +2,8 @@ namespace FixOrderBooking.Server.Domain
 {
     public class OrderBook
     {
-        public SortedDictionary<decimal, LinkedList<Order>> Bids { get; set; } = [];
-        public SortedDictionary<decimal, LinkedList<Order>> Offers { get; set; } = [];
+        public string Symbol { get; set; } = string.Empty;
+        public IReadOnlyList<Order> Sell { get; set; } = [];
+        public IReadOnlyList<Order> Buy { get; set; } = [];
     }
 }

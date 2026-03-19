@@ -14,4 +14,10 @@
     <PackageReference Include="UUID" Version="1.1.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="$(NuGetPackageRoot)quickfixn.fix44/1.14.0/DataDictionary/FIX44.xml"
+          CopyToOutputDirectory="PreserveNewest"
+          Link="FIX44.xml" />
+  </ItemGroup>
+
 </Project>

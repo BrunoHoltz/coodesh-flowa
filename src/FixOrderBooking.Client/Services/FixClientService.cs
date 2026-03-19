@@ -1,11 +1,11 @@
-using FixOrderBooking.Client.Application;
+using FixOrderBooking.Client.FIX;
 using QuickFix;
 using QuickFix.Store;
 using QuickFix.Transport;
 
-namespace FixOrderBooking.Client.Infra;
+namespace FixOrderBooking.Client.Services;
 
-public sealed class FixClientService : IHostedService, IDisposable
+public class FixClientService : IHostedService, IDisposable
 {
     private readonly FixClientApplication _app;
     private readonly ILoggerFactory _loggerFactory;
@@ -34,15 +34,16 @@ public sealed class FixClientService : IHostedService, IDisposable
         var heartBtInt = _config["FIX:HeartBtInt"] ?? "30";
         var reconnectInterval = _config["FIX:ReconnectInterval"] ?? "5";
 
+        var dataDictionary = Path.Combine(AppContext.BaseDirectory, "FIX44.xml");
+
         var cfg = $"""
             [DEFAULT]
             ConnectionType=initiator
             ReconnectInterval={reconnectInterval}
-            FileStorePath=store
             StartTime=00:00:00
             EndTime=00:00:00
             UseDataDictionary=Y
-            DataDictionary=FIX44.xml
+            DataDictionary={dataDictionary}
 
             [SESSION]
             BeginString=FIX.4.4
@@ -54,7 +55,7 @@ public sealed class FixClientService : IHostedService, IDisposable
             """;
 
         var settings = new SessionSettings(new StringReader(cfg));
-        var storeFactory = new FileStoreFactory(settings);
+        var storeFactory = new MemoryStoreFactory();
 
         _initiator = new SocketInitiator(_app, storeFactory, settings, loggerFactoryNullable: _loggerFactory);
         _initiator.Start();

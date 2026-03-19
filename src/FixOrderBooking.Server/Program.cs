@@ -4,6 +4,11 @@ using FixOrderBooking.Server.Infra;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.ConfigureHttpJsonOptions(opts =>
+{
+    opts.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
 builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
 builder.Services.AddSingleton<IOrderBookService, OrderBookService>();
 builder.Services.AddSingleton<FixServerApplication>();

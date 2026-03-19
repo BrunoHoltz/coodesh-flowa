@@ -1,9 +1,13 @@
-using FixOrderBooking.Client.Application;
-using FixOrderBooking.Client.Infra;
+using FixOrderBooking.Client.FIX;
+using FixOrderBooking.Client.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddHttpClient<OrdersService>();
+builder.Services.AddHttpClient("server", client =>
+    client.BaseAddress = new Uri(builder.Configuration["ServerBaseUrl"] ?? "http://localhost:5000"));
+
+builder.Services.AddTransient(sp =>
+    sp.GetRequiredService<IHttpClientFactory>().CreateClient("server"));
 
 builder.Services.AddSingleton<FixClientApplication>();
 builder.Services.AddSingleton<FixAcceptorApplication>();

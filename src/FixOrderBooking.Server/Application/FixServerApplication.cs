@@ -76,7 +76,7 @@ public sealed class FixServerApplication : MessageCracker, IApplication
     {
         var clOrdId = msg.ClOrdID.Value;
         var symbol = msg.Symbol.Value;
-        OrderSide side = msg.Side.Value;
+        var side = (OrderSide)msg.Side.Value;
         var qty = msg.OrderQty.Value;
         var price = msg.Price.Value;
 
@@ -109,7 +109,7 @@ public sealed class FixServerApplication : MessageCracker, IApplication
         var origClOrdId = msg.OrigClOrdID.Value;
         var clOrdId = msg.ClOrdID.Value;
         var symbol = msg.Symbol.Value;
-        OrderSide side = msg.Side.Value;
+        var side = (OrderSide)msg.Side.Value;
 
         _logger.LogInformation(
             "CancelRequest: ClOrdID={ClOrdID} OrigClOrdID={OrigClOrdID}",
@@ -164,7 +164,7 @@ public sealed class FixServerApplication : MessageCracker, IApplication
             new ExecType(ExecType.REJECTED),
             new OrdStatus(OrdStatus.REJECTED),
             new Symbol(symbol),
-            new Side(side),
+            new Side((char)side),
             new LeavesQty(0),
             new CumQty(0),
             new AvgPx(0))
@@ -215,7 +215,7 @@ public sealed class FixServerApplication : MessageCracker, IApplication
             new ExecType(execType),
             new OrdStatus(ordStatus),
             new Symbol(symbol),
-            new Side(side),
+            new Side((char)side),
             new LeavesQty(leavesQty),
             new CumQty(cumQty),
             new AvgPx(cumQty > 0 ? price : 0))

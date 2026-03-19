@@ -8,7 +8,7 @@ internal static class OrderBookHttp
     {
         app.MapGet("/orders/active", (IOrderBookService service) =>
         {
-            var result = service.GetActiveOrders();
+            var result = service.GetActiveOrderBook();
 
             if (!result.IsSuccess)
                 return MapError(result.ErrorType, result.ErrorMessage!);
@@ -16,8 +16,7 @@ internal static class OrderBookHttp
             return Results.Ok(result.Value);
         })
         .WithName("GetActiveOrders")
-        .Produces<IReadOnlyList<object>>()
-        .Produces(StatusCodes.Status500InternalServerError);
+        .Produces<IReadOnlyList<object>>();
 
         return app;
     }

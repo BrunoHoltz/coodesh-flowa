@@ -1,11 +1,11 @@
-using FixOrderBooking.Client.Application;
+using FixOrderBooking.Client.FIX;
 using QuickFix;
 using QuickFix.Store;
 using QuickFix.Transport;
 
-namespace FixOrderBooking.Client.Infra;
+namespace FixOrderBooking.Client.Services;
 
-public sealed class FixAcceptorService : IHostedService, IDisposable
+public class FixAcceptorService : IHostedService, IDisposable
 {
     private readonly FixAcceptorApplication _app;
     private readonly ILoggerFactory _loggerFactory;
@@ -35,7 +35,7 @@ public sealed class FixAcceptorService : IHostedService, IDisposable
         var cfg = $"""
             [DEFAULT]
             ConnectionType=acceptor
-            FileStorePath=store
+            ResetOnLogon=Y
             StartTime=00:00:00
             EndTime=00:00:00
             UseDataDictionary=Y
@@ -50,7 +50,7 @@ public sealed class FixAcceptorService : IHostedService, IDisposable
             """;
 
         var settings = new SessionSettings(new StringReader(cfg));
-        var storeFactory = new FileStoreFactory(settings);
+        var storeFactory = new MemoryStoreFactory();
 
         _acceptor = new ThreadedSocketAcceptor(_app, storeFactory, settings, loggerFactory: _loggerFactory);
         _acceptor.Start();

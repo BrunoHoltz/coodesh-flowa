@@ -4,9 +4,9 @@ using QuickFix.Fields;
 using QuickFix.FIX44;
 using Message = QuickFix.Message;
 
-namespace FixOrderBooking.Client.Application;
+namespace FixOrderBooking.Client.FIX;
 
-public sealed class FixAcceptorApplication : MessageCracker, IApplication
+public class FixAcceptorApplication : MessageCracker, IApplication
 {
     private readonly FixClientApplication _initiator;
     private readonly ILogger<FixAcceptorApplication> _logger;
@@ -30,8 +30,14 @@ public sealed class FixAcceptorApplication : MessageCracker, IApplication
         _sessions[sessionID] = session;
         _logger.LogInformation("Acceptor session created: {SessionID}", sessionID);
     }
-    public void OnLogon(SessionID sessionID) =>
+    public void OnLogon(SessionID sessionID)
+    {
+        // Re-register on every logon: OnCreate fires only once at acceptor startup,
+        // but clients may reconnect multiple times.
+        var session = Session.LookupSession(sessionID);
+        if (session != null) _sessions[sessionID] = session;
         _logger.LogInformation("Acceptor logon: {SessionID}", sessionID);
+    }
     public void OnLogout(SessionID sessionID)
     {
         _sessions.TryRemove(sessionID, out _);
